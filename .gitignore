@@ -28,6 +28,7 @@ score
 # do not include csv in Git
 csv
 
+*~
 .*
 !.*ignore
 !.*.json
