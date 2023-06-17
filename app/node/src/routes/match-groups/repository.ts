@@ -8,7 +8,7 @@ export const hasSkillNameRecord = async (
   skillName: string
 ): Promise<boolean> => {
   const [rows] = await pool.query<RowDataPacket[]>(
-    "SELECT * FROM skill WHERE EXISTS (SELECT * FROM skill WHERE skill_name = ?)",
+    "SELECT skill_id, skill_name FROM skill WHERE EXISTS (SELECT skill_id, skill_name FROM skill WHERE skill_name = ?)",
     [skillName]
   );
   return rows.length > 0;
@@ -33,6 +33,27 @@ export const getUserIdsBeforeMatched = async (
   return userIdRows.map((row) => row.user_id);
 };
 
+// export const insertMatchGroup = async (matchGroupDetail: MatchGroupDetail) => {
+//   await pool.query<RowDataPacket[]>(
+//     "INSERT INTO match_group (match_group_id, match_group_name, description, status, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+//     [
+//       matchGroupDetail.matchGroupId,
+//       matchGroupDetail.matchGroupName,
+//       matchGroupDetail.description,
+//       matchGroupDetail.status,
+//       matchGroupDetail.createdBy,
+//       matchGroupDetail.createdAt,
+//     ]
+//   );
+
+//   for (const member of matchGroupDetail.members) {
+//     await pool.query<RowDataPacket[]>(
+//       "INSERT INTO match_group_member (match_group_id, user_id) VALUES (?, ?)",
+//       [matchGroupDetail.matchGroupId, member.userId]
+//     );
+//   }
+// };
+
 export const insertMatchGroup = async (matchGroupDetail: MatchGroupDetail) => {
   await pool.query<RowDataPacket[]>(
     "INSERT INTO match_group (match_group_id, match_group_name, description, status, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?)",
@@ -46,12 +67,14 @@ export const insertMatchGroup = async (matchGroupDetail: MatchGroupDetail) => {
     ]
   );
 
-  for (const member of matchGroupDetail.members) {
-    await pool.query<RowDataPacket[]>(
+  const insertPromises = matchGroupDetail.members.map(member =>
+    pool.query<RowDataPacket[]>(
       "INSERT INTO match_group_member (match_group_id, user_id) VALUES (?, ?)",
       [matchGroupDetail.matchGroupId, member.userId]
-    );
-  }
+    )
+  );
+
+  await Promise.all(insertPromises);
 };
 
 export const getMatchGroupDetailByMatchGroupId = async (
@@ -101,17 +124,33 @@ export const getMatchGroupsByMatchGroupIds = async (
   matchGroupIds: string[],
   status: string
 ): Promise<MatchGroup[]> => {
-  let matchGroups: MatchGroup[] = [];
-  for (const matchGroupId of matchGroupIds) {
-    const matchGroupDetail = await getMatchGroupDetailByMatchGroupId(
-      matchGroupId,
-      status
-    );
-    if (matchGroupDetail) {
-      const { description: _description, ...matchGroup } = matchGroupDetail;
-      matchGroups = matchGroups.concat(matchGroup);
-    }
-  }
+  const promises = matchGroupIds.map(matchGroupId =>
+    getMatchGroupDetailByMatchGroupId(matchGroupId, status)
+  );
+  const matchGroupDetails = await Promise.all(promises);
+  
+  const matchGroups: MatchGroup[] = matchGroupDetails
+    .filter((matchGroupDetail): matchGroupDetail is MatchGroupDetail => matchGroupDetail !== undefined)
+    .map(({ description, ...matchGroup }) => matchGroup);
 
   return matchGroups;
 };
+
+// export const getMatchGroupsByMatchGroupIds = async (
+//   matchGroupIds: string[],
+//   status: string
+// ): Promise<MatchGroup[]> => {
+//   let matchGroups: MatchGroup[] = [];
+//   for (const matchGroupId of matchGroupIds) {
+//     const matchGroupDetail = await getMatchGroupDetailByMatchGroupId(
+//       matchGroupId,
+//       status
+//     );
+//     if (matchGroupDetail) {
+//       const { description: _description, ...matchGroup } = matchGroupDetail;
+//       matchGroups = matchGroups.concat(matchGroup);
+//     }
+//   }
+
+//   return matchGroups;
+// };
