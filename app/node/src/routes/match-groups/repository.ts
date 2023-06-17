@@ -33,6 +33,27 @@ export const getUserIdsBeforeMatched = async (
   return userIdRows.map((row) => row.user_id);
 };
 
+// export const insertMatchGroup = async (matchGroupDetail: MatchGroupDetail) => {
+//   await pool.query<RowDataPacket[]>(
+//     "INSERT INTO match_group (match_group_id, match_group_name, description, status, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+//     [
+//       matchGroupDetail.matchGroupId,
+//       matchGroupDetail.matchGroupName,
+//       matchGroupDetail.description,
+//       matchGroupDetail.status,
+//       matchGroupDetail.createdBy,
+//       matchGroupDetail.createdAt,
+//     ]
+//   );
+
+//   for (const member of matchGroupDetail.members) {
+//     await pool.query<RowDataPacket[]>(
+//       "INSERT INTO match_group_member (match_group_id, user_id) VALUES (?, ?)",
+//       [matchGroupDetail.matchGroupId, member.userId]
+//     );
+//   }
+// };
+
 export const insertMatchGroup = async (matchGroupDetail: MatchGroupDetail) => {
   await pool.query<RowDataPacket[]>(
     "INSERT INTO match_group (match_group_id, match_group_name, description, status, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?)",
@@ -46,12 +67,14 @@ export const insertMatchGroup = async (matchGroupDetail: MatchGroupDetail) => {
     ]
   );
 
-  for (const member of matchGroupDetail.members) {
-    await pool.query<RowDataPacket[]>(
+  const insertPromises = matchGroupDetail.members.map(member =>
+    pool.query<RowDataPacket[]>(
       "INSERT INTO match_group_member (match_group_id, user_id) VALUES (?, ?)",
       [matchGroupDetail.matchGroupId, member.userId]
-    );
-  }
+    )
+  );
+
+  await Promise.all(insertPromises);
 };
 
 export const getMatchGroupDetailByMatchGroupId = async (
