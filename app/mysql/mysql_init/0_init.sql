@@ -14,21 +14,12 @@ CREATE TABLE `user` (
     PRIMARY KEY (`user_id`)
 );
 
-ALTER TABLE `user`
-ADD INDEX `idx_office_id` (`user_id`),
-ADD INDEX `idx_employee_id` (`employee_id`),
-ADD INDEX `idx_office_id` (`office_id`),
-ADD INDEX `idx_user_icon_id` (`user_icon_id`);
-
 CREATE TABLE `session` (
     `session_id` VARCHAR(36) NOT NULL,
     `linked_user_id` VARCHAR(36) NOT NULL,
     `created_at` DATE NOT NULL,
     PRIMARY KEY (`session_id`)
 );
-
-ALTER TABLE `session`
-ADD INDEX `idx_linked_user_id` (`linked_user_id`);
 
 CREATE TABLE `department` (
     `department_id` VARCHAR(36) NOT NULL,
@@ -53,9 +44,6 @@ CREATE TABLE `department_role_member` (
     PRIMARY KEY (`department_id`, `role_id`, `user_id`, `entry_date`)
 );
 
-ALTER TABLE `department_role_member`
-ADD INDEX `idx_user_id` (`user_id`);
-
 CREATE TABLE `office` (
     `office_id` VARCHAR(36) NOT NULL,
     `office_name` VARCHAR(50) NOT NULL,
@@ -69,9 +57,6 @@ CREATE TABLE `file` (
     PRIMARY KEY (`file_id`)
 );
 
-ALTER TABLE `file`
-ADD INDEX `idx_file_id` (file_id);
-
 CREATE TABLE `skill` (
     `skill_id` VARCHAR(36) NOT NULL,
     `skill_name` VARCHAR(50) NOT NULL,
@@ -84,9 +69,6 @@ CREATE TABLE `skill_member` (
     PRIMARY KEY (`skill_id`, `user_id`)
 );
 
-ALTER TABLE `skill_member`
-ADD INDEX `idx_user_id` (`user_id`);
-
 CREATE TABLE `match_group` (
     `match_group_id` VARCHAR(36) NOT NULL,
     `match_group_name` VARCHAR(50) NOT NULL,
@@ -97,15 +79,8 @@ CREATE TABLE `match_group` (
     PRIMARY KEY (`match_group_id`)
 );
 
-ALTER TABLE `match_group`
-ADD INDEX `idx_created_by` (`created_by`);
-
 CREATE TABLE `match_group_member` (
     `match_group_id` VARCHAR(36) NOT NULL,
     `user_id` VARCHAR(36) NOT NULL,
     PRIMARY KEY (`match_group_id`, `user_id`)
 );
-
--- ALTER TABLE `match_group_member`
--- ADD INDEX `idx_user_id` (`user_id`);
--- ADD INDEX `idx_match_group_id` (`match_group_id`);
