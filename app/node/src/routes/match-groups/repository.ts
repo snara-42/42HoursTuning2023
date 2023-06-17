@@ -8,8 +8,7 @@ export const hasSkillNameRecord = async (
   skillName: string
 ): Promise<boolean> => {
   const [rows] = await pool.query<RowDataPacket[]>(
-    "SELECT skill_id, user_id FROM skill WHERE EXISTS (SELECT * FROM skill WHERE skill_name = ?)",
-    // "SELECT * FROM skill WHERE EXISTS (SELECT * FROM skill WHERE skill_name = ?)",
+    "SELECT * FROM skill WHERE EXISTS (SELECT * FROM skill WHERE skill_name = ?)",
     [skillName]
   );
   return rows.length > 0;
