@@ -15,6 +15,7 @@ CREATE TABLE `user` (
 );
 
 ALTER TABLE `user`
+ADD INDEX `idx_office_id` (`user_id`),
 ADD INDEX `idx_employee_id` (`employee_id`),
 ADD INDEX `idx_office_id` (`office_id`),
 ADD INDEX `idx_user_icon_id` (`user_icon_id`);
@@ -68,6 +69,9 @@ CREATE TABLE `file` (
     PRIMARY KEY (`file_id`)
 );
 
+ALTER TABLE `file`
+ADD INDEX `idx_file_id` (file_id);
+
 CREATE TABLE `skill` (
     `skill_id` VARCHAR(36) NOT NULL,
     `skill_name` VARCHAR(50) NOT NULL,
@@ -101,3 +105,7 @@ CREATE TABLE `match_group_member` (
     `user_id` VARCHAR(36) NOT NULL,
     PRIMARY KEY (`match_group_id`, `user_id`)
 );
+
+-- ALTER TABLE `match_group_member`
+-- ADD INDEX `idx_user_id` (`user_id`);
+-- ADD INDEX `idx_match_group_id` (`match_group_id`);
