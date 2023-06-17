@@ -8,8 +8,7 @@ export const hasSkillNameRecord = async (
   skillName: string
 ): Promise<boolean> => {
   const [rows] = await pool.query<RowDataPacket[]>(
-    "SELECT skill_id, user_id FROM skill WHERE EXISTS (SELECT * FROM skill WHERE skill_name = ?)",
-    // "SELECT * FROM skill WHERE EXISTS (SELECT * FROM skill WHERE skill_name = ?)",
+    "SELECT skill_id, skill_name FROM skill WHERE EXISTS (SELECT skill_id, skill_name FROM skill WHERE skill_name = ?)",
     [skillName]
   );
   return rows.length > 0;
@@ -125,17 +124,33 @@ export const getMatchGroupsByMatchGroupIds = async (
   matchGroupIds: string[],
   status: string
 ): Promise<MatchGroup[]> => {
-  let matchGroups: MatchGroup[] = [];
-  for (const matchGroupId of matchGroupIds) {
-    const matchGroupDetail = await getMatchGroupDetailByMatchGroupId(
-      matchGroupId,
-      status
-    );
-    if (matchGroupDetail) {
-      const { description: _description, ...matchGroup } = matchGroupDetail;
-      matchGroups = matchGroups.concat(matchGroup);
-    }
-  }
+  const promises = matchGroupIds.map(matchGroupId =>
+    getMatchGroupDetailByMatchGroupId(matchGroupId, status)
+  );
+  const matchGroupDetails = await Promise.all(promises);
+  
+  const matchGroups: MatchGroup[] = matchGroupDetails
+    .filter((matchGroupDetail): matchGroupDetail is MatchGroupDetail => matchGroupDetail !== undefined)
+    .map(({ description, ...matchGroup }) => matchGroup);
 
   return matchGroups;
 };
+
+// export const getMatchGroupsByMatchGroupIds = async (
+//   matchGroupIds: string[],
+//   status: string
+// ): Promise<MatchGroup[]> => {
+//   let matchGroups: MatchGroup[] = [];
+//   for (const matchGroupId of matchGroupIds) {
+//     const matchGroupDetail = await getMatchGroupDetailByMatchGroupId(
+//       matchGroupId,
+//       status
+//     );
+//     if (matchGroupDetail) {
+//       const { description: _description, ...matchGroup } = matchGroupDetail;
+//       matchGroups = matchGroups.concat(matchGroup);
+//     }
+//   }
+
+//   return matchGroups;
+// };

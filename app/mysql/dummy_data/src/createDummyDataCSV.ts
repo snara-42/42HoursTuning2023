@@ -27,22 +27,42 @@ import {
 
 let departments: Department[] = [];
 
+let roles: Role[] = [];
+
+let offices: Office[] = [];
+
+let files: File[] = [];
+
+let skills: Skill[] = [];
+
+let users: User[] = [];
+
+// const createDepartments = () => {
+//   const departmentNum = 60;
+
+//   for (let i = 0; i < departmentNum; i++) {
+//     departments.push({
+//       department_id: uuidv4(),
+//       department_name: `${departmentNames[i % departmentNames.length]}${
+//         ((i / departmentNames.length) | 0) + 1
+//       }`,
+//       active: i >= departmentNum / 2, // 0 <= i <= 29 はactive = false
+//     });
+//   }
+//   fs.appendFileSync("/csv/department_init.csv", stringify(departments));
+// };
+
 const createDepartments = () => {
   const departmentNum = 60;
 
-  for (let i = 0; i < departmentNum; i++) {
-    departments.push({
-      department_id: uuidv4(),
-      department_name: `${departmentNames[i % departmentNames.length]}${
-        ((i / departmentNames.length) | 0) + 1
-      }`,
-      active: i >= departmentNum / 2, // 0 <= i <= 29 はactive = false
-    });
-  }
-  fs.appendFileSync("/csv/department_init.csv", stringify(departments));
-};
+  const departments = Array.from({ length: departmentNum }, (_, i) => ({
+    department_id: uuidv4(),
+    department_name: `${departmentNames[i % departmentNames.length]}${Math.floor(i / departmentNames.length) + 1}`,
+    active: i >= departmentNum / 2,
+  }));
 
-let roles: Role[] = [];
+  fs.writeFileSync('/csv/department_init.csv', stringify(departments));
+};
 
 const createRoles = () => {
   roles = roleNames.map((roleName) => {
@@ -56,8 +76,6 @@ const createRoles = () => {
   fs.appendFileSync("/csv/role_init.csv", stringify(roles));
 };
 
-let offices: Office[] = [];
-
 const createOffices = () => {
   offices = officeNames.map((officeName) => {
     return {
@@ -68,8 +86,6 @@ const createOffices = () => {
 
   fs.appendFileSync("/csv/office_init.csv", stringify(offices));
 };
-
-let files: File[] = [];
 
 const createFiles = () => {
   files = fileNames.map((fileName, index) => {
@@ -83,8 +99,6 @@ const createFiles = () => {
   fs.appendFileSync("/csv/file_init.csv", stringify(files));
 };
 
-let skills: Skill[] = [];
-
 const createSkills = () => {
   skills = skillNames.map((skillName) => {
     return {
@@ -96,10 +110,9 @@ const createSkills = () => {
   fs.appendFileSync("/csv/skill_init.csv", stringify(skills));
 };
 
-let users: User[] = [];
-
 const createUsers = () => {
   const userNum = 300000;
+  // const dummyPassword = "DummyPassword";
   for (let i = 0; i < userNum; i++) {
     const userName = createName();
 
@@ -116,6 +129,7 @@ const createUsers = () => {
       kana: userName.kana,
       mail: `popy${i + 1}@example.com`,
       password: hashPassword,
+      // password: dummyPassword,
       entry_date: `${entryYear}-04-01`,
       office_id: offices[Math.floor(Math.random() * offices.length)].office_id,
       user_icon_id:
@@ -252,6 +266,7 @@ const createMatchGroups = () => {
 
 const createCEO = () => {
   const userName = createName();
+  // const dummyPassword = "dummyPassword";
 
   const hash = crypto.createHash("sha256");
   hash.update("pass0");
@@ -265,6 +280,7 @@ const createCEO = () => {
       kana: userName.kana,
       mail: "popy0@example.com",
       password: hashPassword,
+      // password: dummyPassword,
       entry_date: "1980-04-01",
       office_id: offices[Math.floor(Math.random() * offices.length)].office_id,
       user_icon_id: files[Math.floor(Math.random() * files.length)].file_id,
