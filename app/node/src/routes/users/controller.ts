@@ -36,7 +36,7 @@ usersRouter.get(
 //      });
 
       const path = userIcon.path;
-      const cachePath = `images/user-icon-resized/${userIcon.fileName}`;
+      const cachePath = `images/user-icon/cache/${userIcon.fileName}`;
       let resizedImage: Buffer;
       if (!fs.existsSync(cachePath)) {
         // Cache does not exist, create resized image and cache it.
