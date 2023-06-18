@@ -5,6 +5,8 @@ import { getUserByUserId } from "./repository";
 import { getFileByFileId } from "../files/repository";
 import { SearchedUser, Target, User } from "../../model/types";
 import { getUsersByKeyword } from "./usecase";
+import sharp from "sharp";
+import fs from "fs";
 
 export const usersRouter = express.Router();
 
@@ -28,15 +30,27 @@ usersRouter.get(
         console.warn("specified user icon not found");
         return;
       }
+
+//      // 500px x 500pxでリサイズ
+//      const data = execSync(`convert ${path} -resize 500x500! PNG:-`, {
+//        shell: "/bin/bash",
+//      });
+
       const path = userIcon.path;
-      // 500px x 500pxでリサイズ
-      const data = execSync(`convert ${path} -resize 500x500! PNG:-`, {
-        shell: "/bin/bash",
-      });
+      const cachePath = `images/user-icon-resized/${userIcon.fileName}`;
+      let resizedImage: Buffer;
+      if (!fs.existsSync(cachePath)) {
+        // Cache does not exist, create resized image and cache it.
+        resizedImage = await sharp(path).resize(500, 500).toBuffer();
+        fs.writeFileSync(cachePath, resizedImage);
+      } else {
+        resizedImage = fs.readFileSync(cachePath);
+      }
       res.status(200).json({
         fileName: userIcon.fileName,
-        data: data.toString("base64"),
+        data: resizedImage.toString("base64"),
       });
+
       console.log("successfully get user icon");
     } catch (e) {
       next(e);
