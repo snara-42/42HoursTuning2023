@@ -8,7 +8,6 @@ const mysqlOption: PoolOptions = {
   waitForConnections: true,
   connectionLimit: 128,
   connectTimeout: 100000,
-  acquireTimeout: 100000,
 };
 
 const pool: Pool = createPool(mysqlOption);
