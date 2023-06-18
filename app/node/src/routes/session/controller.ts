@@ -2,6 +2,7 @@ import express from "express";
 import { execSync } from "child_process";
 import { v4 as uuidv4 } from "uuid";
 import { getUserIdByMailAndPassword } from "../users/repository";
+import crypto from "crypto";
 import {
   getSessionByUserId,
   createSession,
@@ -34,10 +35,12 @@ sessionRouter.post(
 
     const { mail, password }: { mail: string; password: string } = req.body;
 
-    const hashPassword = execSync(
-      `echo -n ${password} | shasum -a 256 | awk '{printf $1}'`,
-      { shell: "/bin/bash" }
-    ).toString();
+//    const hashPassword = execSync(
+//      `echo -n ${password} | shasum -a 256 | awk '{printf $1}'`,
+//      { shell: "/bin/bash" }
+//    ).toString();
+	
+    const hashPassword = crypto.createHash("sha256").update(password).digest("hex");
 
     try {
       const userId = await getUserIdByMailAndPassword(mail, hashPassword);
