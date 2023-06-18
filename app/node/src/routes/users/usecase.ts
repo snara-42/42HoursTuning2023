@@ -70,8 +70,7 @@ export const getUsersByKeyword = async (
 		}
 	});
 	const usersArray = await Promise.all(promises);
-	const users: SearchedUser[] = [];
-	users.concat(...usersArray);
+	const users = ([] as SearchedUser[]).concat(...usersArray);
 
 	targets.forEach((target, i) => {
 		console.log(`${usersArray[i].length} users found by ${target}`);
