@@ -96,14 +96,14 @@ export const getUsersByUserIds = async (
 	if (userIds.length == 0) {
 		return [];
 	}
-	const query = `SELECT user.user_id, user.user_name, user.kana, user.entry_date, user.office_id, user.user_icon_id,
+	const query = `SELECT
+		user.user_id, user.user_name, user.kana, user.entry_date, user.office_id, user.user_icon_id,
 		file.file_name, office.office_name
 	FROM user 
 	LEFT JOIN office ON user.office_id = office.office_id 
 	LEFT JOIN file ON user.user_icon_id = file.file_id
-	WHERE user.user_id IN (?)
-	LIMIT ? `;
-	const [usersRows] = await pool.query<RowDataPacket[]>(query, [userIds, userIds.length]);
+	WHERE user.user_id IN (?)`;
+	const [usersRows] = await pool.query<RowDataPacket[]>(query, [userIds]);
 	let users: SearchedUser[] = convertToSearchedUser(usersRows);
 
 	//  let users: SearchedUser[] = [];
@@ -234,8 +234,9 @@ export const getUsersBySkillName = async (
 	skillName: string
 ): Promise<SearchedUser[]> => {
 	const [skillIdRows] = await pool.query<RowDataPacket[]>(
-		`SELECT s.skill_id FROM skill s WHERE MATCH (s.skill_name) AGAINST (? IN BOOLEAN MODE)`,
-		[`*${skillName}*`]
+		//`SELECT s.skill_id FROM skill s WHERE MATCH (s.skill_name) AGAINST (? IN BOOLEAN MODE)`,
+		`SELECT s.skill_id FROM skill s WHERE s.skill_name like ?`,
+		[`%${skillName}%`]
 	);
 	const skillIds: string[] = skillIdRows.map((row) => row.skill_id);
 	if (skillIds.length === 0) {
