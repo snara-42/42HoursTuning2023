@@ -8,7 +8,7 @@ export const hasSkillNameRecord = async (
   skillName: string
 ): Promise<boolean> => {
   const [rows] = await pool.query<RowDataPacket[]>(
-    "SELECT skill_id, skill_name FROM skill WHERE EXISTS (SELECT skill_id, skill_name FROM skill WHERE skill_name = ?)",
+    "SELECT s.skill_id, s.skill_name FROM skill s WHERE EXISTS (SELECT sk.skill_id, sk.skill_name FROM skill sk WHERE sk.skill_name = ?)",
     [skillName]
   );
   return rows.length > 0;
@@ -18,7 +18,7 @@ export const getUserIdsBeforeMatched = async (
   userId: string
 ): Promise<string[]> => {
   const [matchGroupIdRows] = await pool.query<RowDataPacket[]>(
-    "SELECT match_group_id FROM match_group_member WHERE user_id = ?",
+    "SELECT m.match_group_id FROM match_group_member m WHERE m.user_id = ?",
     [userId]
   );
   if (matchGroupIdRows.length === 0) {
@@ -26,7 +26,7 @@ export const getUserIdsBeforeMatched = async (
   }
 
   const [userIdRows] = await pool.query<RowDataPacket[]>(
-    "SELECT user_id FROM match_group_member WHERE match_group_id IN (?)",
+    "SELECT m.user_id FROM match_group_member m WHERE m.match_group_id IN (?)",
     [matchGroupIdRows]
   );
 
@@ -82,7 +82,7 @@ export const getMatchGroupDetailByMatchGroupId = async (
   status?: string
 ): Promise<MatchGroupDetail | undefined> => {
   let query =
-    "SELECT match_group_id, match_group_name, description, status, created_by, created_at FROM match_group WHERE match_group_id = ?";
+    "SELECT m.match_group_id, m.match_group_name, m.description, m.status, m.created_by, m.created_at FROM match_group m WHERE m.match_group_id = ?";
   if (status === "open") {
     query += " AND status = 'open'";
   }
@@ -92,7 +92,7 @@ export const getMatchGroupDetailByMatchGroupId = async (
   }
 
   const [matchGroupMemberIdRows] = await pool.query<RowDataPacket[]>(
-    "SELECT user_id FROM match_group_member WHERE match_group_id = ?",
+    "SELECT m.user_id FROM match_group_member m WHERE m.match_group_id = ?",
     [matchGroupId]
   );
   const matchGroupMemberIds: string[] = matchGroupMemberIdRows.map(
@@ -114,7 +114,7 @@ export const getMatchGroupIdsByUserId = async (
   userId: string
 ): Promise<string[]> => {
   const [matchGroupIds] = await pool.query<RowDataPacket[]>(
-    "SELECT match_group_id FROM match_group_member WHERE user_id = ?",
+    "SELECT m.match_group_id FROM match_group_member m WHERE m.user_id = ?",
     [userId]
   );
   return matchGroupIds.map((row) => row.match_group_id);
