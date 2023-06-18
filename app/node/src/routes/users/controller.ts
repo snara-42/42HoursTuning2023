@@ -200,7 +200,7 @@ usersRouter.get(
 );
 
 const isValidTarget = (targets: string[]): boolean => {
-  const validTargets: Target[] = [
+  const validTargets: Set<Target> = new Set([
     "userName",
     "kana",
     "mail",
@@ -209,9 +209,9 @@ const isValidTarget = (targets: string[]): boolean => {
     "office",
     "skill",
     "goal",
-  ];
+  ]);
 
-  return targets.every((target) => validTargets.includes(target as Target));
+  return targets.every((target) => validTargets.has(target as Target));
 };
 
 // ログインユーザー取得API

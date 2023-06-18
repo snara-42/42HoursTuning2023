@@ -56,3 +56,5 @@ ALTER TABLE `role` ADD FULLTEXT INDEX idx_ngram_role_name (`role_name`) WITH PAR
 
 ALTER TABLE `office` ADD FULLTEXT INDEX idx_ngram_office_name (`office_name`) WITH PARSER ngram;
 
+ALTER TABLE `skill` ADD FULLTEXT INDEX idx_ngram_skill_name (`skill_name`) WITH PARSER ngram;
+
