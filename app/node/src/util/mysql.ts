@@ -6,9 +6,7 @@ const mysqlOption: PoolOptions = {
   password: "mysql",
   database: "app",
   waitForConnections: true,
-  connectionLimit: 128,
-  // connectTimeout: 100000,
-  // acquireTimeout: 100000,
+  connectionLimit: 10,
 };
 
 const pool: Pool = createPool(mysqlOption);
